@@ -221,6 +221,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
     if ($isSMSmode) {
       $criteria = [
+        'is_deleted' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deleted = 0"),
         'is_opt_out' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_opt_out = 0"),
         'is_deceased' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deceased <> 1"),
         'do_not_sms' => CRM_Utils_SQL_Select::fragment()->where("$contact.do_not_sms = 0"),
@@ -233,8 +234,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       ];
     }
     else {
-      // Criterias to filter recipients that need to be included
+      // Criteria to filter recipients that need to be included
       $criteria = [
+        'is_deleted' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deleted = 0"),
         'do_not_email' => CRM_Utils_SQL_Select::fragment()->where("$contact.do_not_email = 0"),
         'is_opt_out' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_opt_out = 0"),
         'is_deceased' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deceased <> 1"),
@@ -1204,6 +1206,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // Add job ID to mailParams for external email delivery service to utilise
     $mailParams['job_id'] = $job_id;
+
+    $mailParams['contact_id'] = $contactId;
 
     CRM_Utils_Hook::alterMailParams($mailParams, 'civimail');
 
